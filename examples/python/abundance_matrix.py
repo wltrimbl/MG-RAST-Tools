@@ -2,14 +2,15 @@
 '''This script retrieves a metagenome_statistics data structure from the MG-RAST API and
 plots a graph using data from the web interface'''
 
-import urllib2, json, sys, os
+import urllib, urllib2, json, sys, os
+
+from mgrtools import GET_url, get_mgr_key
 
 API_URL = "http://api.metagenomics.anl.gov/1"
-# Assign the value of key from the OS environment
-try:
-    key = os.environ["MGRKEY"]
-except KeyError:
-    key = ""
+
+CALL = "/matrix/organism"
+
+key = get_mgr_key()
 
 # assign parameters
 metagenomes = ["mgm4447943.3", "mgm4447102.3"]
@@ -18,20 +19,11 @@ result_type = "abundance"
 source = "SEED"
 
 # construct API call 
-base_url = API_URL + "/matrix/organism"
-base_url = base_url + "?group_level=%s&result_type=%s&auth=%s&source=%s&evalue=15&" % (group_level, result_type, key, source) 
-base_url = base_url + "&".join( [ "id=%s" % m for m in metagenomes ] ) 
 
-# retrieve the data by sending at HTTP GET request to the MG-RAST API
-sys.stderr.write("Retrieving %s\n" % base_url)
-try:
-    opener = urllib2.urlopen(base_url)
-except urllib2.HTTPError, e:
-    print "Error with HTTP request: %d %s\n%s" % (e.code, e.reason, e.read())
-    sys.exit(255)
-opener.addheaders = [('User-agent', 'abundance_matrix.py')]
+parameters = {"group_level": group_level, "result_type": result_type, "auth":key, "source":source, "evalue":15 }
+base_url = API_URL + CALL + "?"  +  urllib.urlencode( parameters ) +"&"  + "&".join( [ "id=%s" % m for m in metagenomes ] )
 
-jsonobject = opener.read()
+jsonobject = GET_url(base_url)
 
 # convert the data from a JSON structure to a python data type, a dict of dicts.
 jsonstructure = json.loads(jsonobject)
