@@ -4,3 +4,4 @@
 ./download_metagenome_sequences.py MGR4440613.3 > download_metagenome_sequences.out
 ./sequences_with_annotations.py > sequences_with_annotations.out
 ./list_all_metagenomes.py > list_all_metagenomes.out
+./list_all_projects.py > list_all_projects.out
