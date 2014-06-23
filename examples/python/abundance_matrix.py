@@ -23,7 +23,7 @@ source = "SEED"
 parameters = {"group_level": group_level, "result_type": result_type, "auth":key, "source":source, "evalue":15}
 base_url = API_URL + CALL + "?" + urllib.urlencode(parameters) +"&" + "&".join(["id=%s" % m for m in metagenomes])
 
-jsonobject = GET_url(base_url)
+jsonobject = GET_url(base_url, user_agent="abundance_matrix.py")
 
 # convert the data from a JSON structure to a python data type, a dict of dicts.
 jsonstructure = json.loads(jsonobject)

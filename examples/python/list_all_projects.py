@@ -21,7 +21,7 @@ offset = "0"
 
 parameters = {"order": "id", "limit": limit, "auth": key, "offset":offset}
 base_url = API_URL + CALL + "?" + urllib.urlencode(parameters)
-jsonobject = GET_url(base_url)
+jsonobject = GET_url(base_url, user_agent="list_all_projects.py")
 
 # convert the data from a JSON structure to a python data type, a dict of dicts.
 jsonstructure = json.loads(jsonobject)
