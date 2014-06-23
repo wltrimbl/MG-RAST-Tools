@@ -18,10 +18,10 @@ group_level = "domain"
 result_type = "abundance"
 source = "SEED"
 
-# construct API call 
+# construct API call
 
-parameters = {"group_level": group_level, "result_type": result_type, "auth":key, "source":source, "evalue":15 }
-base_url = API_URL + CALL + "?"  +  urllib.urlencode( parameters ) +"&"  + "&".join( [ "id=%s" % m for m in metagenomes ] )
+parameters = {"group_level": group_level, "result_type": result_type, "auth":key, "source":source, "evalue":15}
+base_url = API_URL + CALL + "?" + urllib.urlencode(parameters) +"&" + "&".join(["id=%s" % m for m in metagenomes])
 
 jsonobject = GET_url(base_url)
 
@@ -32,17 +32,17 @@ jsonstructure = json.loads(jsonobject)
 cols = jsonstructure["columns"]
 rows = jsonstructure["rows"]
 data = jsonstructure["data"]
- 
-h = { (a, b) : int(c) for (a, b, c) in data } 
-sys.stdout.write("Taxon\t") 
-for j in range(0, len(cols) ):
+
+h = {(a, b) : int(c) for (a, b, c) in data}
+sys.stdout.write("Taxon\t")
+for j in range(0, len(cols)):
     sys.stdout.write(cols[j]["id"] +"\t")
 print
-for i in range( 0, len(rows)):
-    sys.stdout.write(str(rows[i]["id"])+"\t") 
-    for j in range( 0, len(cols)):
+for i in range(0, len(rows)):
+    sys.stdout.write(str(rows[i]["id"])+"\t")
+    for j in range(0, len(cols)):
         try:
-            sys.stdout.write(str(h[(i, j)])+"\t" )
+            sys.stdout.write(str(h[(i, j)])+"\t")
         except KeyError:
             sys.stdout.write("0\t")
     sys.stdout.write("\n")
