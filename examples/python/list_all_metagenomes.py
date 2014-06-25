@@ -19,7 +19,7 @@ CALL = "/metagenome"
 key = get_mgr_key()
 
 # assign parameters
-limit = "10"
+limit = "1" # initial call
 offset = "0"
 
 # construct API call
@@ -34,10 +34,12 @@ jsonstructure = json.loads(jsonobject)
 # unpack and display the data table
 total_count = jsonstructure["total_count"]
 
+limit = 1000
+
 sys.stderr.write("Total number of records: {:d}\n".format(total_count))
 
-for i in range(0, total_count / 10000 +1):
-    parameters = {"limit": 10000, "offset": i * 10000, "auth": key}
+for i in range(0, total_count / limit +1):
+    parameters = {"limit": limit, "offset": i * limit, "auth": key}
     base_url = API_URL + CALL + "?" + urllib.urlencode(parameters)
     jsonstructure = json.loads(GET_url(base_url))
     printlist(jsonstructure)

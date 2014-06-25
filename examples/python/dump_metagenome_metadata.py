@@ -60,7 +60,7 @@ CALL = "/metagenome"
 key = get_mgr_key()
 
 # assign parameters
-limit = "1000"
+limit = "1"  # initial call
 offset = "0"
 
 # construct API call
@@ -76,7 +76,7 @@ jsonstructure = json.loads(jsonobject)
 total_count = jsonstructure["total_count"]
 
 sys.stderr.write("Total number of records: {:d}\n".format(total_count))
-limit = 10
+limit = 1000
 
 klist = []
 for i in range(0, total_count / limit +1):
