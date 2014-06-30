@@ -99,7 +99,7 @@ offset = "0"
 
 # construct API call
 
-parameters = {"limit": limit, "offset": offset}
+parameters = {"limit": limit, "offset": offset, "auth": key }
 base_url = API_URL + CALL + "?" + urllib.urlencode(parameters)
 jsonobject = GET_url(base_url, user_agent="dump_sequence_stats.py")
 
@@ -114,7 +114,7 @@ limit = 1000
 
 klist = []
 for i in range(0, total_count / limit +1):
-    parameters = {"limit": limit, "offset": i * limit, "verbosity" :"stats"}
+    parameters = {"limit": limit, "offset": i * limit, "verbosity" :"stats", "auth": key}
     base_url = API_URL + CALL + "?" + urllib.urlencode(parameters)
     jsonstructure = json.loads(GET_url(base_url))
 
