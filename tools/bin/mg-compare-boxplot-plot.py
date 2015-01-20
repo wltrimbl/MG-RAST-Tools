@@ -14,7 +14,7 @@ VERSION
     %s
 
 SYNOPSIS
-    mg-compare-boxplot-plot [ --help, --input <input file or stdin>, --format <cv: 'text' or 'biom'>, --plot <filename for png>, --rlib <R lib path>, --height <image height in inches>, --width <image width in inches>, --dpi <image DPI>, --name <boolean>, --label <boolean> ]
+    mg-compare-boxplot-plot [ --help, --input <input file or stdin>, --format <cv: 'text' or 'biom'>, --plot <filename for png>, --reference <boolean>, --rlib <R lib path>, --height <image height in inches>, --width <image width in inches>, --dpi <image DPI>, --name <boolean>, --label <boolean> ]
 
 DESCRIPTION
     Tool to generate boxplot vizualizations from metagenome abundance profiles.
@@ -43,15 +43,19 @@ def main(args):
     OptionParser.format_description = lambda self, formatter: self.description
     OptionParser.format_epilog = lambda self, formatter: self.epilog
     parser = OptionParser(usage='', description=prehelp%VERSION, epilog=posthelp%AUTH_LIST)
+    parser.add_option("", "--user", dest="user", default=None, help="OAuth username")
+    parser.add_option("", "--passwd", dest="passwd", default=None, help="OAuth password")
+    parser.add_option("", "--token", dest="token", default=None, help="OAuth token")
     parser.add_option("", "--input", dest="input", default='-', help="input: filename or stdin (-), default is stdin")
     parser.add_option("", "--format", dest="format", default='biom', help="input format: 'text' for tabbed table, 'biom' for BIOM format, default is biom")
     parser.add_option("", "--plot", dest="plot", default=None, help="filename for output plot")
+    parser.add_option("", "--reference", dest="reference", type="int", default=0, help="plot saved as shock reference object: 1=true, 0=false")
     parser.add_option("", "--rlib", dest="rlib", default=None, help="R lib path")
     parser.add_option("", "--height", dest="height", type="float", default=8.5, help="image height in inches, default is 4")
     parser.add_option("", "--width", dest="width", type="float", default=11, help="image width in inches, default is 5")
     parser.add_option("", "--dpi", dest="dpi", type="int", default=300, help="image DPI, default is 300")
-    parser.add_option("", "--name", dest="name", action="store_true", default=False, help="label columns by name (biom only), default is by id")
-    parser.add_option("", "--label", dest="label", action="store_true", default=False, help="label image rows, default is off")
+    parser.add_option("", "--name", dest="name", type="int", default=0, help="label columns by name, default is by id: 1=true, 0=false")
+    parser.add_option("", "--label", dest="label", type="int", default=0, help="label image rows, default is off: 1=true, 0=false")
     
     # get inputs
     (opts, args) = parser.parse_args()
@@ -69,6 +73,14 @@ def main(args):
     if not opts.rlib:
         sys.stderr.write("ERROR: missing path to R libs\n")
         return 1
+    for o in ['reference', 'name', 'label']:
+        if getattr(opts, o) not in [0, 1]:
+            sys.stderr.write("ERROR: invalid value for '%s'\n"%o)
+            return 1
+    
+    return 0
+    # get auth
+    token = get_auth_token(opts)
     
     # parse input for R
     tmp_in  = 'tmp_'+random_str()+'.txt'
@@ -78,7 +90,8 @@ def main(args):
         if opts.format == 'biom':
             try:
                 indata = json.loads(indata)
-                biom_to_tab(indata, tmp_hdl, col_name=opts.name)
+                col_name = True if opts.name == 1 else False
+                biom_to_tab(indata, tmp_hdl, col_name=col_name)
             except:
                 sys.stderr.write("ERROR: input BIOM data not correct format\n")
                 return 1
@@ -90,7 +103,7 @@ def main(args):
     tmp_hdl.close()
     
     # build R cmd
-    label = 'TRUE' if opts.label else 'FALSE'
+    label = 'TRUE' if opts.label == 1 else 'FALSE'
     r_cmd = """source("%s/plot_mg_boxplot.r")
 suppressMessages( plot_mg_boxplot(
     table_in="%s",
@@ -101,6 +114,10 @@ suppressMessages( plot_mg_boxplot(
     image_res_dpi=%d
 ))"""%(opts.rlib, tmp_in, opts.plot, label, opts.height, opts.width, opts.dpi)
     execute_r(r_cmd)
+    
+    # shock ref
+    if opts.reference == 1:
+        png_shock_ref(opts.plot+'.png', opts.plot, token)
     
     # cleanup
     os.remove(tmp_in)
