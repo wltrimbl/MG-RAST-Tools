@@ -28,8 +28,8 @@ jsonobject = GET_url(base_url)
 # convert the data from a JSON structure to a python data type, a dict of dicts.
 jsonstructure = json.loads(jsonobject)
 
-for record in jsonstructure:
-    for k in ["file_type","stage_name", "url", "file_id", "id", "stage_id", "file_name"]:
+for record in jsonstructure["data"]:
+    for k in ["file_format","stage_name", "url", "file_id", "id", "stage_id", "file_name"]:
         print record[k] + "\t",
     print 
 
