@@ -58,6 +58,7 @@ def main(args):
     parser.add_option("", "--evalue", type="int", dest="evalue", default=15, help="negative exponent value for maximum e-value cutoff, default is 15")
     parser.add_option("", "--identity", type="int", dest="identity", default=60, help="percent value for minimum % identity cutoff, default is 60")
     parser.add_option("", "--length", type="int", dest="length", default=15, help="value for minimum alignment length cutoff, default is 15")
+    parser.add_option("", "--version", type="int", dest="version", default=1, help="M5NR annotation version to use, default is 1")
     parser.add_option("", "--temp", dest="temp", default=None, help="filename to temporarly save biom output at each iteration")
     
     # get inputs
@@ -97,6 +98,7 @@ def main(args):
                ('evalue', opts.evalue),
                ('identity', opts.identity),
                ('length', opts.length),
+               ('version', opts.version),
                ('result_type', 'abundance'),
                ('asynchronous', '1') ]
     if opts.intersect_level and opts.intersect_name:
@@ -146,7 +148,7 @@ def main(args):
             for f in opts.filter_name.strip().split(','):
                 filter_list.append(f)
         # annotation mapping from m5nr
-        params = [ ('version', '1'),
+        params = [ ('version', opts.version),
                    ('min_level', opts.level),
                    ('source', opts.source) ]
         url = opts.url+'/m5nr/ontology?'+urllib.urlencode(params, True)
